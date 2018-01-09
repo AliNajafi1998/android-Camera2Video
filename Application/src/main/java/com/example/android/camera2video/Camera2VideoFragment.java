@@ -26,6 +26,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
@@ -53,6 +54,7 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import java.io.File;
@@ -275,7 +277,13 @@ public class Camera2VideoFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_camera2_video, container, false);
+        View view = inflater.inflate(R.layout.fragment_camera2_video, container, false);
+
+        LinearLayout surface = (LinearLayout)view.findViewById(R.id.surface);
+        surface.addView(new Box(this.getActivity()));
+        surface.setBackgroundColor(Color.TRANSPARENT);
+
+        return view;
     }
 
     @Override
