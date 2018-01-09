@@ -30,6 +30,10 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
@@ -65,6 +69,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+
+import static android.content.Context.SENSOR_SERVICE;
 
 public class Camera2VideoFragment extends Fragment
         implements View.OnClickListener, FragmentCompat.OnRequestPermissionsResultCallback {
@@ -221,6 +227,10 @@ public class Camera2VideoFragment extends Fragment
     private String mNextVideoAbsolutePath;
     private CaptureRequest.Builder mPreviewBuilder;
 
+    LinearLayout surface;
+    private Sensor gyroscopeSensor;
+    private SensorEventListener gyroscopeSensorListener;
+
     public static Camera2VideoFragment newInstance() {
         return new Camera2VideoFragment();
     }
@@ -279,7 +289,7 @@ public class Camera2VideoFragment extends Fragment
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_camera2_video, container, false);
 
-        LinearLayout surface = (LinearLayout)view.findViewById(R.id.surface);
+        surface = (LinearLayout)view.findViewById(R.id.surface);
         surface.addView(new Box(this.getActivity()));
         surface.setBackgroundColor(Color.TRANSPARENT);
 
@@ -303,7 +313,10 @@ public class Camera2VideoFragment extends Fragment
         } else {
             mTextureView.setSurfaceTextureListener(mSurfaceTextureListener);
         }
+
+        addGyroSensor();
     }
+
 
     @Override
     public void onPause() {
@@ -334,6 +347,35 @@ public class Camera2VideoFragment extends Fragment
                 break;
             }
         }
+    }
+
+    public void addGyroSensor() {
+        SensorManager sensorManager =
+                (SensorManager) getActivity().getSystemService(SENSOR_SERVICE);
+        gyroscopeSensor =
+                sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+        gyroscopeSensorListener = new SensorEventListener() {
+            @Override
+            public void onSensorChanged(SensorEvent sensorEvent) {
+                if(sensorEvent.values[2] > 0.5f) { // anticlockwise
+//                    ViewGroup.LayoutParams layoutParams=new ViewGroup.LayoutParams(surface.getWidth(), surface.getHeight());
+//                    layoutParams.
+//                    layoutParams.setMargins(surface.getLeft(), surface.getTop(), surface.getRight(), surface.getBottom());
+//                    surface.setLayoutParams(layoutParams);
+                    surface.setLeft(surface.getLeft()+5);
+
+                } else if(sensorEvent.values[2] < -0.5f) { // clockwise
+                    surface.setLeft(surface.getLeft()-5);
+                }
+            }
+
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int i) {
+            }
+        };
+
+        sensorManager.registerListener(gyroscopeSensorListener,
+                gyroscopeSensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     /**

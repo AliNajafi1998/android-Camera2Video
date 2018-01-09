@@ -1,8 +1,8 @@
 
-Android Camera2Video Sample with an Overlay view
-================================================
+Android Camera2Video Sample with an Overlay view that moves with gryoscope sensor movement
+==========================================================================================
 
-This is a sample application that works on top of the sample Camera2Video provided by Google with the addition of an overlay view on top.
+This is a sample application that works on top of the sample Camera2Video provided by Google with the addition of an overlay view on top. The view also moves according to gyroscope movements. This is of course intended as sample code for experimentation.
 
 This sample shows how to record video using the new Camera2 API in Android Lollipop.
 
